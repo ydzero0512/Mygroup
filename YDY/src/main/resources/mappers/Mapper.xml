@@ -5,5 +5,17 @@
   
   <mapper namespace="com.mygroyp.mapper.MygroupMapper">
   	
+  	<!-- VO객체 정보 매핑 -->
+  	
+  	<resultMap type="com.mygroup.domain.MemberVO" id="member">
+  		<result property="content" column="content"/>	
+  	</resultMap>
+  	
+  	<!-- 사원 생성 -->
+  	
+  	<insert id="create">
+  		INSERT INTO member (memberId, grade, department, email, phone, name, birthDay) 
+  		VALUES (#{memberId},#{grade},#{department},#{email},#{phone},#{name},#{birthDay})
+  	</insert>
 
   </mapper>
