@@ -39,7 +39,13 @@ public class HomeController {
 	
 	//http://localhost:8088/board
 	@RequestMapping(value = "/member/memberInsert", method = RequestMethod.GET)
-	public void myBoard() {
+	public void GETmemberInsert() {
+		
+	}
+	
+	//http://localhost:8088/board
+	@RequestMapping(value = "/member/workTime", method = RequestMethod.GET)
+	public void GETworkTime() {
 		
 	}
 	

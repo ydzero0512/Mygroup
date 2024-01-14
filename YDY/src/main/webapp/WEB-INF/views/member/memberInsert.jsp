@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	
@@ -18,7 +18,7 @@ $(document).ready(function(){
 				"grade":$('#grade').val(),
 				"department":$('#department').val(),
 				"phone":$('#phone').val(),
-				"birthDay":$('#birthDay').val(),
+				"birthDay":$('#birthDay').val()
 		};// var obj end
 		// 		console.log(obj);
 		// REST컨트롤러로 이동해서 데이터 처리 !!
@@ -45,10 +45,19 @@ $(document).ready(function(){
 		});// ajax end
 		
 	});// click end
+	
 		});//js end
+		
 </script>
 </head>
-<body>
+
+<body id="body-pd" style="font-family: 'TheJamsil5';">
+
+	
+ 	<!-- header && sidebar include -->
+    <jsp:include page="../header.jsp"></jsp:include>
+	<!-- header && sidebar include -->  
+
 	사원번호(자동부여): <input type="text" id="memberId"><br>
 	이름 : <input type="text" id="name"><br>
 	이메일 : <input type="text" id="email"><br>

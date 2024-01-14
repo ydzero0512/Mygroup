@@ -27,6 +27,7 @@ public class RestTestController {
 	// 사원을 등록하기 위한 기능 
 	@RequestMapping(value = "/member/memberInsert",method = RequestMethod.POST)
 	public ResponseEntity<String> memberInsertPost(@RequestBody MemberVO vo) throws Exception{
+		System.out.print(vo);
 		logger.info("사원등록 시작~ ");
 		mservice.insertMember(vo);
 		
