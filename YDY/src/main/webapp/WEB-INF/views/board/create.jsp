@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <html lang="ko">
 	<head>
-	    <title>Create</title>
+	    <title>글쓰기</title>
 	
 	    <!-- TUI 에디터 CSS CDN -->
 	    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />

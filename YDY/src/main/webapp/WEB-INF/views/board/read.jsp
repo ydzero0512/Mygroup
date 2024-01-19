@@ -22,6 +22,7 @@
     작성시간 : <input type="datetime" id="wdate" readonly="readonly"><br>
     수정시간 : <input type="datetime" id="udate" readonly="readonly"><br>
     작성자 : <input type="text" id="writer" readonly="readonly"><br>
+    조회수 : <span id="readcount"></span>
     
     <div id="content">
     
@@ -52,21 +53,43 @@
 	
 	        // 2. API 호출
 	        const url = '/board/posts/${bno}';
-	        const response = await fetch(url);
-	        const post = await response.json();
-	        document.querySelector('#title').value = post.title;
-	        document.querySelector('#wdate').value = post.wdate;
-	        document.querySelector('#udate').value = post.udate;
-	        document.querySelector('#writer').value = post.writer;
-	    	const editor = new toastui.Editor({
-	            el: document.querySelector('#content'),      // 에디터를 적용할 요소 (컨테이너)
-	            viewer: true,
-	            height: '500px',                             // 에디터 영역의 높이 값 (OOOpx || auto)
-//	            initialEditType: 'markdown',                 // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
-	            initialValue: post.content,                            // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
-//	            previewStyle: 'vertical',                    // 마크다운 프리뷰 스타일 (tab || vertical)
-//	            placeholder: '내용을 입력해 주세요.',
-	        });
+	    	let checkViewCnt = sessionStorage.getItem('checkViewCnt');
+	    	console.log(checkViewCnt);
+	    	const readcount = '/board/readcount/${bno}';
+	    	try {
+	    		if(checkViewCnt == 'true') {
+		    		fetch(readcount, {
+		    			method: 'PUT'
+	    			});
+		    		sessionStorage.setItem('checkViewCnt', false);
+	    		}
+
+				try {
+			        const response = await fetch(url);
+			        const post = await response.json();
+			        document.querySelector('#title').value = post.title;
+			        document.querySelector('#wdate').value = post.wdate;
+			        document.querySelector('#udate').value = post.udate;
+			        document.querySelector('#writer').value = post.writer;
+			        document.querySelector('#readcount').innerHTML = post.readcount;
+			    	const editor = new toastui.Editor({
+			            el: document.querySelector('#content'),      // 에디터를 적용할 요소 (컨테이너)
+			            viewer: true,
+			            height: '500px',                             // 에디터 영역의 높이 값 (OOOpx || auto)
+//			            initialEditType: 'markdown',                 // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+			            initialValue: post.content,                  // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+//			            previewStyle: 'vertical',                    // 마크다운 프리뷰 스타일 (tab || vertical)
+//			            placeholder: '내용을 입력해 주세요.',
+			        });
+ 		        }catch (error){
+	        	alert("글을 불러올 수 없습니다");
+		        	console.error('로딩 실패 : ', error)
+		        }		    		
+		    		
+	    	}catch(error) {
+	    		alert("오류가 발생했습니다.");
+	    		console.error('조회수처리 오류 : ', error);
+	    	}
 	    }
 	    
 	    async function deletePost() {
@@ -77,10 +100,11 @@
                 });
                 console.log(response);
 //                const postId = await response.json();
-                alert('게시글이 저장되었습니다.');
+                alert('게시글이 삭제되었습니다.');
                 location.href = '/board/${category}/list';
 
             } catch (error) {
+            	alert("오류가 발생했습니다.");
                 console.error('저장 실패 : ', error)
             }
 	    }

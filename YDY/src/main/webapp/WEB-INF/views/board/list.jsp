@@ -2,7 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <html>
 	<head>
-		<title>Home</title>
+		<title>게시판</title>
 	    <style>
 	        #btnDiv { text-align: center; margin-top: 20px; }
 	        .btns { display: inline-block; padding: 0 10px; height: 28px; line-height: 26px; text-align: center; vertical-align: middle; border-radius: 3px; border: 1px solid transparent; font-weight: 500; }
@@ -50,6 +50,7 @@
 	
 //	        window.onload = async () => {
 	            findAllPost();
+	            sessionStorage.setItem('checkViewCnt', true);
 //	        }
             document.querySelector('#category').value = '${category}';
 	        // 전체 게시글 조회
