@@ -14,6 +14,8 @@ public class MemberVO {
 	private String phone;
 	private String name;
 	private Timestamp birthDay;
+	private String password;
+	private Integer isAdmin;
 	
 	public Integer getId() {
 		return id;
@@ -77,6 +79,22 @@ public class MemberVO {
 
 	public void setBirthDay(Timestamp birthDay) {
 		this.birthDay = birthDay;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Integer getIsAdmin() {
+		return isAdmin;
+	}
+
+	public void setIsAdmin(Integer isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 
 	@Override

@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 navigator.geolocation.getCurrentPosition((position) => {
@@ -36,7 +37,11 @@ navigator.geolocation.getCurrentPosition((position) => {
 });
 </script>
 </head>
-<body>
+<body id="body-pd">
+	
+ 	<!-- header && sidebar include -->
+    <jsp:include page="../header.jsp"></jsp:include>
+	<!-- header && sidebar include --> 
 <h1>근태관리</h1>
 <button id="workStart"> 출근 </button>
 <input type="text" id="workStartTime" readonly="readonly">

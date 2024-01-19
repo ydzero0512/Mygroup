@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +26,7 @@ public class RestTestController {
 
 	
 	// 사원을 등록하기 위한 기능 
-	@RequestMapping(value = "/member/memberInsert",method = RequestMethod.POST)
+	@PostMapping("/member/memberInsert")
 	public ResponseEntity<String> memberInsertPost(@RequestBody MemberVO vo) throws Exception{
 		System.out.print(vo);
 		logger.info("사원등록 시작~ ");
