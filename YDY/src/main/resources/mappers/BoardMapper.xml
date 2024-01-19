@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.mygroup.mapper.BoardMapper">
+  	
+  	<!-- VO객체 정보 매핑 -->
+  	
+  	<resultMap type="BoardVO" id="boardVO">
+	  	<result property="bno" column="bno" jdbcType="INTEGER" javaType="int" />
+	    <result property="title" column="title" jdbcType="VARCHAR" javaType="String" />
+	    <result property="content" column="content" jdbcType="CLOB" javaType="java.lang.String" />
+	    <result property="writer" column="writer" jdbcType="INTEGER" javaType="int" />	    
+	    <result property="wdate" column="wdate" jdbcType="TIMESTAMP" javaType="String" />
+	    <result property="udate" column="udate" jdbcType="TIMESTAMP" javaType="String" />
+	    <result property="category" column="category" jdbcType="VARCHAR" javaType="String" />
+	    <result property="readcount" column="readcount" jdbcType="INTEGER" javaType="int" />
+	    <result property="re_ref" column="re_ref" jdbcType="INTEGER" javaType="int" />
+	    <result property="re_lev" column="re_lev" jdbcType="INTEGER" javaType="int" />
+	    <result property="re_seq" column="re_seq" jdbcType="INTEGER" javaType="int" />
+  	</resultMap>
+  	
+	<insert id="createPost" parameterType="BoardVO">
+		insert into board
+		values (#{bno}, #{title}, #{content}, #{writer}, now(), null, #{category}, 0, #{re_ref}, #{re_lev}, #{re_seq})
+	</insert>
+	
+	<update id="updateReply">
+		update board set re_seq=re_seq+1
+		<where>
+			re_ref = #{re_ref} and re_seq > #{re_seq};
+		</where>
+	</update>
+
+	<select id="getMaxBno" resultType="int">
+		select max(bno) from board
+	</select>
+  	<select id="getPostCount" resultType="int">
+		select count(*) from board
+		<where>
+			category = #{category}
+		</where>
+	</select>
+	
+	<select id="getPostList" resultMap="boardVO">
+		select bno, title, writer, wdate, udate, category from board
+	</select>
+
+	<select id="getSelectedPostList" parameterType="java.util.Map" resultMap="boardVO">
+		select bno, title, writer, wdate, udate, category, readcount, re_ref, re_lev, re_seq from board
+		<where>
+			category = #{category}
+			order by re_ref desc, re_seq asc 
+	  		limit #{pvo.startPage}, #{pvo.pageSize}
+		</where>
+	</select>
+	
+	<select id="readPost" resultMap="boardVO">
+		select * from board
+		<where>
+			#{bno} = bno
+		</where>
+	</select>
+	
+	<update id="updatePost">
+		update board set
+		content = #{content},
+		udate = now()
+		<where>
+			bno = #{bno}
+		</where>
+	</update>
+
+	<delete id="deletePost">
+		delete from board
+		<where>
+			bno = #{bno}
+		</where>
+	</delete>
+
+  </mapper>
