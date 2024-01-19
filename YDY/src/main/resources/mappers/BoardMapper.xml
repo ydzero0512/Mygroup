@@ -78,5 +78,11 @@
 			bno = #{bno}
 		</where>
 	</delete>
-
+	
+	<update id="updateReadcount" parameterType="int">
+		update board set readcount=readcount+1
+		<where>
+			bno=#{bno};
+		</where>
+	</update>
   </mapper>

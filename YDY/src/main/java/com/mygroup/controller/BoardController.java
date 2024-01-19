@@ -18,7 +18,6 @@ public class BoardController {
 	@GetMapping(value = "/{category}/list")
 	public String list(HttpSession session, Model model, @PathVariable(name = "category") String category) {
 		model.addAttribute(category);
-		session.setAttribute("checkViewCnt", true);
 		return "/board/list";
 	}
 	

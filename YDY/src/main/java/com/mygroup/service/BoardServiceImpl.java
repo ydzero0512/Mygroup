@@ -48,5 +48,9 @@ public class BoardServiceImpl implements BoardService {
 	public Integer replyCreate(BoardVO vo) {
 		return bdao.replyCreate(vo);
 	}
+	@Override
+	public Integer updateReadCount(Integer bno) {
+		return bdao.updateReadCount(bno);
+	}
 
 }

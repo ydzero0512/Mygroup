@@ -21,4 +21,6 @@ public interface BoardDAO {
 
 	public Integer replyCreate(BoardVO vo);
 
+	public Integer updateReadCount(Integer bno);
+
 }

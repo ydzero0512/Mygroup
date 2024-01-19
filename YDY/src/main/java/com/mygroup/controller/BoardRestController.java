@@ -93,6 +93,14 @@ public class BoardRestController {
 		return result > 0 ? new ResponseEntity<String>(HttpStatus.OK) : new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@PutMapping(value = "/readcount/{bno}")
+	public ResponseEntity<String> readCount(@PathVariable(name = "bno") Integer bno) {
+		logger.info("RC : updateReadCount");
+		Integer result = bService.updateReadCount(bno);
+		logger.info("RC : updateReadCount result" + result);
+		return result > 0 ? new ResponseEntity<String>(HttpStatus.OK) : new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@PostMapping(value = "/reply")
 	public ResponseEntity<String> reply(@RequestBody BoardVO vo) {
 		logger.info("RC : reply" + vo.toString());

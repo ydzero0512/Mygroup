@@ -74,4 +74,9 @@ public class BoardDAOImpl implements BoardDAO {
 		return sqlSession.insert(NAMESPACE + ".createPost", vo);
 	}
 
+	@Override
+	public Integer updateReadCount(Integer bno) {
+		return sqlSession.update(NAMESPACE + ".updateReadcount", bno);
+	}
+
 }
