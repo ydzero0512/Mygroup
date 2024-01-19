@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
   <head>
@@ -24,6 +25,8 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="/resources/css/app-light.css" id="lightTheme">
     <link rel="stylesheet" href="/resources/css/app-dark.css" id="darkTheme" disabled>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
   </head>
   <body class="vertical  light  ">
     <div class="wrapper">

@@ -17,8 +17,13 @@ public class MemberDAOImpl implements MemberDAO {
 	private SqlSession sqlSession;
 	
 	private static final Logger logger = LoggerFactory.getLogger(MemberDAO.class);
-	private static final String NAMESPACE = "com.mygroyp.mapper.MygroupMapper";
+	private static final String NAMESPACE = "com.mygroup.persistence.MemberDAO";
 
+	/*
+	 * 2024.01.19
+	 * 작성자 : 양다영 
+	 * 관리자 기능 - 사원등록
+	 */
 	@Override
 	public void createMember(MemberVO vo) throws Exception {
 		logger.debug("sqlSession객체 - Mybatis-mapper 접근 ");
