@@ -17,7 +17,7 @@ public class MemberDAOImpl implements MemberDAO {
 	private SqlSession sqlSession;
 	
 	private static final Logger logger = LoggerFactory.getLogger(MemberDAO.class);
-	private static final String NAMESPACE = "com.mygroup.persistence.MemberDAO";
+	private static final String NAMESPACE = "com.mygroyp.mapper.MygroupMapper";
 
 	@Override
 	public void createMember(MemberVO vo) throws Exception {
