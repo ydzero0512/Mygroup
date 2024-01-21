@@ -2,6 +2,8 @@ package com.mygroup.domain;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -13,9 +15,12 @@ public class MemberVO {
 	private String email;
 	private String phone;
 	private String name;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Timestamp birthDay;
+	
 	private String password;
-	private Integer isAdmin;
+	private String isAdmin;
 	
 	public Integer getId() {
 		return id;
@@ -89,11 +94,11 @@ public class MemberVO {
 		this.password = password;
 	}
 
-	public Integer getIsAdmin() {
+	public String getIsAdmin() {
 		return isAdmin;
 	}
 
-	public void setIsAdmin(Integer isAdmin) {
+	public void setIsAdmin(String isAdmin) {
 		this.isAdmin = isAdmin;
 	}
 

@@ -33,7 +33,7 @@ h1{text-align: center;font-family: Giants-Inline;margin-bottom: 50px !important;
 		<h1>Mygroup</h1>
 			<form method="post" action="/login">
 				<div>
-					<input type="text" class="form-control" name="username" placeholder="사원번호">
+					<input type="text" class="form-control" name="username" placeholder="이메일">
 				</div>
 				<div>
 					<input type="password" class="form-control" name="password" placeholder="비밀번호">

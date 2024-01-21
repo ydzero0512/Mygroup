@@ -8,7 +8,8 @@
         http://www.springframework.org/schema/security/spring-security.xsd">
 
     <beans:bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" /> <!-- 비밀번호 암호화 시 필요한 bean -->
-
+	<beans:bean id="customUser" class="com.mygroup.service.CustomUserDetailsService"/>
+	
     <http auto-config="true" use-expressions="true">
         <intercept-url pattern="/index" access="hasAnyRole('ADMIN','USER')" />
         <intercept-url pattern="/member/**" access="hasAnyRole('ADMIN','USER')" />
@@ -22,15 +23,11 @@
     </http>
 
     <authentication-manager>
-        <authentication-provider>
-            <jdbc-user-service 
-                data-source-ref="dataSource" 
-                users-by-username-query="select memberId, password, 1 enabled from member where memberId=?"
-                authorities-by-username-query="select memberId, case when isAdmin = 1 then 'ROLE_ADMIN' else 'ROLE_USER' end as authority from member where memberId=?" />
+        <authentication-provider user-service-ref="customUser">
             <password-encoder ref="bcryptPasswordEncoder"/>
         </authentication-provider>
     </authentication-manager>
-
+   
 </beans:beans>
 <!-- 
 1.spring-security 적용을 하기위해 pom.xml에 시큐리티 관련 dependency를 추가해주고 maven update 해주기.

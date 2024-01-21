@@ -43,6 +43,8 @@
               </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+            <sec:authentication property="principal.member" var="member" />
+            ${member.name}
               <a class="dropdown-item" href="#">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
               <a class="dropdown-item" href="#">Activities</a>
@@ -53,6 +55,7 @@
 		        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 		        <button type="submit">로그아웃</button>
 		    </form>
+		  
             </sec:authorize>
         
         </ul>

@@ -1,5 +1,7 @@
 package com.mygroup.service;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mygroup.domain.MemberVO;
+import com.mygroup.domain.MemberWorkTimeVO;
 import com.mygroup.persistence.MemberDAO;
 
 @Service
@@ -33,6 +36,19 @@ public class MemberServiceImpl implements MemberService {
 		// 사원 생성
 		vo.setPassword(bcryptPasswordEncoder.encode(vo.getPassword()));
 		mdao.createMember(vo);
+	}
+
+	@Override
+	public void insertWorkStart(MemberWorkTimeVO vo) throws Exception {
+		// 출근 등록 
+		mdao.createWorkStart(vo);
+		
+	}
+
+	@Override
+	public List<MemberWorkTimeVO> selectWorkTime(Integer memberId) throws Exception {
+		// 근태 리스트 
+		return mdao.readWorkTime(memberId);
 	}
 
 }

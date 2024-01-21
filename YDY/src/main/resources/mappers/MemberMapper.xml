@@ -11,9 +11,20 @@
   		<result property="content" column="content"/>	
   	</resultMap>
   	
+  	<!-- VO객체 정보 매핑 -->
+  	
+  	<resultMap type="com.mygroup.domain.MemberWorkTimeVO" id="mWorkTime">
+  		<result property="content" column="content"/>	
+  	</resultMap>
+  	
+  	<!-- 로그인 -->
+  	<select id="login" resultMap="member">
+  	select * from member where email=#{username}
+  	</select>
+  	
   	<!-- 사원 생성 -->
   	
-  	<insert id="create">
+  	<insert id="createMember">
 	INSERT INTO member (memberId, grade, department, email, phone, name, birthDay, password)
 	VALUES (
 	CONCAT(date_format(now(),"%y%m"), LPAD((SELECT MAX(id) FROM member m), '2', '0')),
@@ -25,6 +36,17 @@
 	#{birthDay},
 	#{password}
 	)
+  	</insert>
+  	
+  	<!-- 사원 근태목록 -->
+  	<select id="readWorkTime" resultMap="mWorkTime">
+  	select * from member_workTime where memberId=#{memberId}
+  	</select>
+  	
+  	<!-- 근태관리 출근 -->
+  	<insert id="createWorkTime">
+  	INSERT INTO member_workTime (memberId, workDate, workStartTime)
+  	VALUES (#{memberId},date_format(now(),'%Y-%m-%d'),now())
   	</insert>
 
   </mapper>

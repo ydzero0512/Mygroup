@@ -1,9 +1,21 @@
 package com.mygroup.persistence;
 
-import com.mygroup.domain.MemberVO;
+import java.util.List;
+
+import com.mygroup.domain.*;
+import com.mygroup.domain.MemberWorkTimeVO;
 
 public interface MemberDAO {
 	
+	public MemberVO readEmail(String email) throws Exception;
+	
 	public void createMember(MemberVO vo) throws Exception; //사원 생성 
-
+	
+	public List<MemberWorkTimeVO> readWorkTime(Integer memberId) throws Exception; //근태 리스트 
+	
+	public void createWorkStart(MemberWorkTimeVO vo) throws Exception; //출근등록 
+	
+	
 }
+
+
