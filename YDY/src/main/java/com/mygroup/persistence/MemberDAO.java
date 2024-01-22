@@ -15,6 +15,7 @@ public interface MemberDAO {
 	
 	public void createWorkStart(MemberWorkTimeVO vo) throws Exception; //출근등록 
 	
+	public void createWorkEnd(MemberWorkTimeVO vo) throws Exception; //출근등록 
 	
 }
 

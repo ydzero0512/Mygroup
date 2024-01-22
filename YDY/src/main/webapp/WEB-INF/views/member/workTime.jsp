@@ -16,8 +16,8 @@ $(document).ready(function(){
     var memberId =  document.getElementById('memberId').value;
     var obj = {
             "memberId": memberId
-       		   }; // var obj end
-       		   
+       		   }; // var obj end  		   
+  		   
 navigator.geolocation.getCurrentPosition((position) => {
 	console.log(position);
 	$('#workStart').click(function(){
@@ -49,9 +49,23 @@ navigator.geolocation.getCurrentPosition((position) => {
 	$('#workEnd').click(function(){
 		var latitude = position.coords.latitude;
 		if(latitude>=35 && latitude<36 ){
-			alert("퇴근성공 ");
 			var endTime = new Date().toTimeString().split(' ')[0];
 			$('#workEndTime').html(endTime);
+            axios.post('/member/workEndTime', obj, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken,
+                }
+            })
+            .then(function (response) {
+            	if(response.data =="ok"){
+                alert("퇴근 성공!!");
+               	}
+            })
+            .catch(function (error) {
+                alert('error');
+            });
+			
 		}else{
 			alert("사무실 위치에서 퇴근 해주세요!");
 		}
@@ -65,7 +79,58 @@ navigator.geolocation.getCurrentPosition((position) => {
          }
      })
      .then(function (response) {
-     	alert(response.data);
+    	 
+    	 const workList = response.data;
+    	 var outputHtml = "";
+         const groupedData = workList.reduce((result, item) => {
+             const week = item.week;
+
+             // 해당 주차가 없으면 새로운 배열 생성
+             if (!result[week]) {
+                 result[week] = [];
+             }
+
+             // 주차에 해당하는 데이터 추가
+             result[week].push(item);
+			 return result;
+             
+         }, {});
+         for (const week in groupedData) {
+             outputHtml += "<div class='card shadow'>";
+             outputHtml += "<div class='card-header' id='heading" + week + "'>";
+             outputHtml += "<a role='button' href='#collapse" + week + "' data-toggle='collapse' data-target='#collapse" + week + "' aria-expanded='false' aria-controls='collapse" + week + "' class='collapsed'>";
+             outputHtml += "<strong><span class='fe fe fe-chevron-down'></span> " + week + "주차 </strong>";
+             outputHtml += "</a>";
+             outputHtml += "</div>";
+             outputHtml += "<div id='collapse" + week + "' class='collapse' aria-labelledby='heading" + week + "' data-parent='#accordion1' style=''>";
+             outputHtml += "<div class='card-body'><table class='table table-hover'>";
+             outputHtml += "<thead>";
+             outputHtml += "<tr>";
+             outputHtml += "<th>일지</th>";
+             outputHtml += "<th>업무시작</th>";
+             outputHtml += "<th>업무종료</th>";
+             outputHtml += "<th>총 근무시간</th>";
+             outputHtml += "</tr>";
+             outputHtml += "</thead>";
+             outputHtml += "<tbody>";
+             if (groupedData.hasOwnProperty(week)) {
+                 // 주차에 해당하는 데이터 가져옴
+                 const weeklyData = groupedData[week];
+                 for (var i = 0; i < weeklyData.length; i++) {
+                     var work = weeklyData[i];
+                     outputHtml += "<tr>";
+                     outputHtml += "<td>" + work.workDate + "</td>";  // 예시 필드
+                     outputHtml += "<td>" + work.workStartTime + "</td>";  // 예시 필드
+                     outputHtml += "<td>" + work.workEndTime + "</td>";  // 예시 필드
+                     outputHtml += "</tr>";
+                 }
+               }
+             outputHtml += "</tbody>";
+             outputHtml += "</table></div></div></div>";
+         }
+         document.getElementById("accordion1").innerHTML = outputHtml;
+
+	
      })
      .catch(function (error) {
          alert('error');
@@ -76,6 +141,7 @@ navigator.geolocation.getCurrentPosition((position) => {
 });
 </script>
 <div class="col-12">
+
 			<h3>근태관리</h3>
 			<sec:authentication property="principal.member" var="member" />	
 			<input type="hidden" id="memberId" value=" ${member.memberId}">
@@ -211,7 +277,7 @@ navigator.geolocation.getCurrentPosition((position) => {
                             <th>근무시간 상세</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="aa">
                           <tr>
                             <td>3224</td>
                             <td>Keith Baird</td>

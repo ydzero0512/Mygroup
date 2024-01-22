@@ -11,8 +11,9 @@ public class MemberWorkTimeVO {
 
 	private Integer id;
 	private Integer memberId;
+	private Integer week;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone = "Asia/Seoul")
 	private Timestamp workDate;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
 	private Timestamp workStartTime;
@@ -58,5 +59,14 @@ public class MemberWorkTimeVO {
 	public void setWorkEndTime(Timestamp workEndTime) {
 		this.workEndTime = workEndTime;
 	}
+
+	public Integer getWeek() {
+		return week;
+	}
+
+	public void setWeek(Integer week) {
+		this.week = week;
+	}
+	
 
 }

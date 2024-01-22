@@ -51,4 +51,11 @@ public class MemberServiceImpl implements MemberService {
 		return mdao.readWorkTime(memberId);
 	}
 
+	@Override
+	public void insertWorkEnd(MemberWorkTimeVO vo) throws Exception {
+		// 퇴근 등록 
+		mdao.createWorkEnd(vo);
+		
+	}
+
 }

@@ -14,4 +14,6 @@ public interface MemberService {
 	public List<MemberWorkTimeVO> selectWorkTime(Integer memberId) throws Exception; //근태 리스트 
 	
 	public void insertWorkStart(MemberWorkTimeVO vo) throws Exception; //출근 등록 
+	
+	public void insertWorkEnd(MemberWorkTimeVO vo) throws Exception; //퇴근 등록 
 }

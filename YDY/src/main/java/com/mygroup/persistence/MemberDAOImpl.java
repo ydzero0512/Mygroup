@@ -51,7 +51,7 @@ public class MemberDAOImpl implements MemberDAO {
 	/*
 	 * 2024.01.21 
 	 * 작성자 : 양다영 
-	 * 근태관리 - 근태목록
+	 * 근태관리 - 출근등록 
 	 */
 	@Override
 	public List<MemberWorkTimeVO> readWorkTime(Integer memberId) throws Exception {
@@ -61,12 +61,26 @@ public class MemberDAOImpl implements MemberDAO {
 	
 	@Override
 	public void createWorkStart(MemberWorkTimeVO vo) throws Exception {
-		 int result =  sqlSession.insert(NAMESPACE+ ".createWorkTime",vo);
+		 int result =  sqlSession.insert(NAMESPACE+ ".createWorkStartTime",vo);
 		 
 		 if(result!=0) {
 			 logger.debug("출근등록 완료!");
 		 }
 		
+	}
+
+	/*
+	 * 2024.01.22  
+	 * 작성자 : 양다영 
+	 * 근태관리 - 퇴근등록 
+	 */
+	@Override
+	public void createWorkEnd(MemberWorkTimeVO vo) throws Exception {
+		 int result =  sqlSession.insert(NAMESPACE+ ".createWorkEndTime",vo);
+		 
+		 if(result!=0) {
+			 logger.debug("퇴근등록 완료!");
+		 }		
 	}
 
 

@@ -40,13 +40,19 @@
   	
   	<!-- 사원 근태목록 -->
   	<select id="readWorkTime" resultMap="mWorkTime">
-  	select * from member_workTime where memberId=#{memberId}
+  	select *,week(workdate,3)as week from member_workTime where memberId=#{memberId}
   	</select>
   	
   	<!-- 근태관리 출근 -->
-  	<insert id="createWorkTime">
+  	<insert id="createWorkStartTime">
   	INSERT INTO member_workTime (memberId, workDate, workStartTime)
   	VALUES (#{memberId},date_format(now(),'%Y-%m-%d'),now())
   	</insert>
+  	
+  	<!-- 근태관리 퇴근 -->
+  	<update id="createWorkEndTime">
+  	UPDATE member_workTime SET workEndTime=now()
+  	WHERE memberId=#{memberId} AND workDate = date_format(now(),'%Y-%m-%d')
+  	</update>
 
   </mapper>
