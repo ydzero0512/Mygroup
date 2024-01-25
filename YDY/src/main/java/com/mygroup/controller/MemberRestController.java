@@ -33,8 +33,8 @@ public class MemberRestController {
 	 * 근태관리 - 사원의 근태 조회 
 	 */
 	@GetMapping(value = "/workTimeList")
-	public ResponseEntity<List<MemberWorkTimeVO>> GETworkTimeList(@RequestParam Integer memberId) throws Exception{
-		List<MemberWorkTimeVO> result = mservice.selectWorkTime(memberId);
+	public ResponseEntity<List<MemberWorkTimeVO>> GETworkTimeList(@RequestParam Integer memberId,@RequestParam String today) throws Exception{
+		List<MemberWorkTimeVO> result = mservice.selectWorkTime(memberId, today);
 		return new ResponseEntity<List<MemberWorkTimeVO>>(result,HttpStatus.OK);
 	}
 	
@@ -58,5 +58,16 @@ public class MemberRestController {
 	public ResponseEntity<String> PostworkEndTime(@RequestBody MemberWorkTimeVO vo) throws Exception{
 		mservice.insertWorkEnd(vo);
 		return new ResponseEntity<String>("ok",HttpStatus.OK);
+	}
+	
+	/*
+	 * 2024.01.25 
+	 * 작성자 : 양다영 
+	 * 근태관리 - 사원의 근태 누적 시간 조회 
+	 */
+	@GetMapping(value = "/workTimeSum")
+	public ResponseEntity<List<MemberWorkTimeVO>> GETworkTimeSum(@RequestParam Integer memberId,@RequestParam String isData) throws Exception{
+		List<MemberWorkTimeVO> result = mservice.selectSumTime(memberId, isData);
+		return new ResponseEntity<List<MemberWorkTimeVO>>(result,HttpStatus.OK);
 	}
 }

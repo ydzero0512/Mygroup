@@ -46,9 +46,9 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public List<MemberWorkTimeVO> selectWorkTime(Integer memberId) throws Exception {
+	public List<MemberWorkTimeVO> selectWorkTime(Integer memberId,String today) throws Exception {
 		// 근태 리스트 
-		return mdao.readWorkTime(memberId);
+		return mdao.readWorkTime(memberId,today);
 	}
 
 	@Override
@@ -56,6 +56,12 @@ public class MemberServiceImpl implements MemberService {
 		// 퇴근 등록 
 		mdao.createWorkEnd(vo);
 		
+	}
+
+	@Override
+	public List<MemberWorkTimeVO> selectSumTime(Integer memberId, String isData) throws Exception {
+		// TODO Auto-generated method stub
+		return mdao.readSumTime(memberId, isData);
 	}
 
 }

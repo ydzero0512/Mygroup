@@ -1,6 +1,8 @@
 package com.mygroup.persistence;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -54,8 +56,11 @@ public class MemberDAOImpl implements MemberDAO {
 	 * 근태관리 - 출근등록 
 	 */
 	@Override
-	public List<MemberWorkTimeVO> readWorkTime(Integer memberId) throws Exception {
-		List<MemberWorkTimeVO> vo = sqlSession.selectList(NAMESPACE+ ".readWorkTime",memberId);
+	public List<MemberWorkTimeVO> readWorkTime(Integer memberId,String today) throws Exception {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("memberId", memberId);
+	    params.put("today", today);
+		List<MemberWorkTimeVO> vo = sqlSession.selectList(NAMESPACE+ ".readWorkTime",params);
 		return vo;
 	}
 	
@@ -81,6 +86,20 @@ public class MemberDAOImpl implements MemberDAO {
 		 if(result!=0) {
 			 logger.debug("퇴근등록 완료!");
 		 }		
+	}
+
+	/*
+	 * 2024.01.25
+	 * 작성자 : 양다영 
+	 * 근태관리 - 누적합 
+	 */
+	@Override
+	public List<MemberWorkTimeVO> readSumTime(Integer memberId, String isData) throws Exception {
+		 Map<String, Object> params = new HashMap<>();
+		    params.put("memberId", memberId);
+		    params.put("isData", isData);
+			List<MemberWorkTimeVO> vo = sqlSession.selectList(NAMESPACE+ ".readTimeSum",params);
+		return vo;
 	}
 
 

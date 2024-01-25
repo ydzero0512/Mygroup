@@ -7,135 +7,195 @@
 #workStart,#workEnd{
 	width : 100%; border-radius : 20px; height : 40px; margin-bottom : 15px;
 }
+.card-header{
+	height : 50px;
+}
+strong{
+	font-size: 18px;
+}
 </style>
 <script type="text/javascript">
 $(document).ready(function(){
 	
     var csrfToken = document.querySelector("meta[name='_csrf']").content; //security에서는 해당값을 추가줘야함!
     var csrfHeader = document.querySelector("meta[name='_csrf_header']").content;
+	var time = new Date().toTimeString().split(' ')[0];
     var memberId =  document.getElementById('memberId').value;
     var obj = {
             "memberId": memberId
        		   }; // var obj end  		   
-  		   
-navigator.geolocation.getCurrentPosition((position) => {
-	console.log(position);
-	$('#workStart').click(function(){
-		var latitude = position.coords.latitude;
-		if(latitude>=35 && latitude<36 ){
-			var startTime = new Date().toTimeString().split(' ')[0];
-			$('#workStartTime').html(startTime);
+       		//// 오늘의 근태확인 
+       		 axios.get('/member/workTimeList?memberId='+memberId+"&today=ok", {
+       	         headers: {
+       	             'Content-Type': 'application/json',
+       	             [csrfHeader]: csrfToken,
+       	         }
+       	     })
+       	     .then(function (response) {
+       	      const workStartTime = response.data[0].workStartTime;
+       	      const workEndTime = response.data[0].workEndTime;
+       	    	$('#workStartTime').html(workStartTime);
+       	    	$('#workStart').prop('disabled', true);
+       	    	if(workEndTime){
+           	    	$('#workEndTime').html(workEndTime);
+           	    	$('#workEnd').prop('disabled', true);
+       	    	}
+       	     });//// 오늘의 근태확인 
+       	     
+        		//// 금주 누적 / 초과 / 잔여 
+       		 axios.get('/member/workTimeSum?memberId='+memberId+"&isData=week", {
+       	         headers: {
+       	             'Content-Type': 'application/json',
+       	             [csrfHeader]: csrfToken,
+       	         }
+       	     })
+       	     .then(function (response) {
+       	      const leftThisWeek = response.data[0].leftThisWeek;
+       	      const sumThisWeek = response.data[0].sumThisWeek;
+       	  	  const overThisWeek = response.data[0].overThisWeek;
+       	   		
+       	    	$('#sumThisWeek1').html(sumThisWeek);
+       	    	$('#sumThisWeek2').html(sumThisWeek);
+       	    	$('#leftThisWeek').html(leftThisWeek);
+       	    	$('#overThisWeek').html(overThisWeek);
 
-                axios.post('/member/workStartTime', obj, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken,
-                    }
-                })
-                .then(function (response) {
-                	if(response.data =="ok"){
-                    alert("출근성공!!");
-                   	}
-                })
-                .catch(function (error) {
-                    alert('error');
-                });
+       	     });//// 금주 누적 / 초과 / 잔여 
+       	     
+        		//// 오늘의 근태확인 
+       		 axios.get('/member/workTimeSum?memberId='+memberId+"&isData=month", {
+       	         headers: {
+       	             'Content-Type': 'application/json',
+       	             [csrfHeader]: csrfToken,
+       	         }
+       	     })
+       	     .then(function (response) {
+       	      const sumThisMonth = response.data[0].sumThisMonth;
+     	      $('#sumThisMonth').html(sumThisMonth);
+       	    	
+       	     });//// 오늘의 근태확인 
+       	     
+       		 axios.get('/member/workTimeList?memberId='+memberId+"&today=no", {
+       	         headers: {
+       	             'Content-Type': 'application/json',
+       	             [csrfHeader]: csrfToken,
+       	         }
+       	     })
+       	     .then(function (response) {
+       	    	 
+       	    	 const workList = response.data;
+       	    	
+       	    	 var outputHtml = "";
+       	         const groupedData = workList.reduce((result, item) => {
+       	             const week = item.week;
+
+       	             // 해당 주차가 없으면 새로운 배열 생성
+       	             if (!result[week]) {
+       	                 result[week] = [];
+       	             }
+
+       	             // 주차에 해당하는 데이터 추가
+       	             result[week].push(item);
+       				 return result;
+       	             
+       	         }, {});
+       	         for (const week in groupedData) {
+       	             outputHtml += "<div class='card shadow'>";
+       	             outputHtml += "<div class='card-header' id='heading" + week + "'>";
+       	             outputHtml += "<a role='button' href='#collapse" + week + "' data-toggle='collapse' data-target='#collapse" + week + "' aria-expanded='false' aria-controls='collapse" + week + "' class='collapsed'>";
+       	             outputHtml += "<strong><span class='fe fe fe-chevron-down'></span> " + week + "주차 </strong>";
+       	             outputHtml += "</a>";
+       	             outputHtml += "</div>";
+       	             outputHtml += "<div id='collapse" + week + "' class='collapse' aria-labelledby='heading" + week + "' data-parent='#accordion1' style=''>";
+       	             outputHtml += "<div class='card-body'><table class='table table-hover'>";
+       	             outputHtml += "<thead>";
+       	             outputHtml += "<tr>";
+       	             outputHtml += "<th>일지</th>";
+       	             outputHtml += "<th>업무시작</th>";
+       	             outputHtml += "<th>업무종료</th>";
+       	             outputHtml += "<th>총 근무시간</th>";
+       	             outputHtml += "</tr>";
+       	             outputHtml += "</thead>";
+       	             outputHtml += "<tbody>";
+       	             if (groupedData.hasOwnProperty(week)) {
+       	                 // 주차에 해당하는 데이터 가져옴
+       	                 const weeklyData = groupedData[week];
+       	                 for (var i = 0; i < weeklyData.length; i++) {
+       	                     var work = weeklyData[i];  
+       	                     outputHtml += "<tr>";
+       	                     outputHtml += "<td>" + work.workDate + "</td>";  
+       	                     outputHtml += "<td>" + work.workStartTime + "</td>";  
+       	                     outputHtml += "<td>" + work.workEndTime + "</td>";
+       	                	 outputHtml += "<td>" + work.todayWorkTime + "</td>";
+       	                     outputHtml += "</tr>";
+       	                 }
+       	               }
+       	             outputHtml += "</tbody>";
+       	             outputHtml += "</table></div></div></div>";
+       	         }
+       	         document.getElementById("accordion1").innerHTML = outputHtml;
+
+       		
+       	     })
+       	     .catch(function (error) {
+       	         alert('error');
+       	     });
+       		//// 근태 목록   		  
+       		
+		navigator.geolocation.getCurrentPosition((position) => {
+			console.log(position);
+			$('#workStart').click(function(){
+				var latitude = position.coords.latitude;
+				if(latitude>=35 && latitude<36 ){
+		
+					$('#workStartTime').html(time);
+		
+		                axios.post('/member/workStartTime', obj, {
+		                    headers: {
+		                        'Content-Type': 'application/json',
+		                        [csrfHeader]: csrfToken,
+		                    }
+		                })
+		                .then(function (response) {
+		                	if(response.data =="ok"){
+		                    alert("출근성공!!");
+		                    location.reload();
+		                   	}
+		                })
+		                .catch(function (error) {
+		                    alert('error');
+		                });
+					
+				}else{
+					alert("사무실 위치에서 출근해주세요!");
+				}
+			}); // 출근버튼 
 			
-		}else{
-			alert("사무실 위치에서 출근해주세요!");
-		}
-	}); // 출근버튼 
+			$('#workEnd').click(function(){
+				var latitude = position.coords.latitude;
+				if(latitude>=35 && latitude<36 ){
+		
+					$('#workEndTime').html(time);
+		            axios.post('/member/workEndTime', obj, {
+		                headers: {
+		                    'Content-Type': 'application/json',
+		                    [csrfHeader]: csrfToken,
+		                }
+		            })
+		            .then(function (response) {
+		            	if(response.data =="ok"){
+		                alert("퇴근 성공!!");
+		                location.reload();
+		               	}
+		            })
+		            .catch(function (error) {
+		                alert('error');
+		            });
+					
+				}else{
+					alert("사무실 위치에서 퇴근 해주세요!");
+				}
+			}); // 퇴근버튼 
 	
-	$('#workEnd').click(function(){
-		var latitude = position.coords.latitude;
-		if(latitude>=35 && latitude<36 ){
-			var endTime = new Date().toTimeString().split(' ')[0];
-			$('#workEndTime').html(endTime);
-            axios.post('/member/workEndTime', obj, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken,
-                }
-            })
-            .then(function (response) {
-            	if(response.data =="ok"){
-                alert("퇴근 성공!!");
-               	}
-            })
-            .catch(function (error) {
-                alert('error');
-            });
-			
-		}else{
-			alert("사무실 위치에서 퇴근 해주세요!");
-		}
-	}); // 퇴근버튼 
-	
-	//// 근태 목록 
-	 axios.get('/member/workTimeList?memberId='+memberId, {
-         headers: {
-             'Content-Type': 'application/json',
-             [csrfHeader]: csrfToken,
-         }
-     })
-     .then(function (response) {
-    	 
-    	 const workList = response.data;
-    	 var outputHtml = "";
-         const groupedData = workList.reduce((result, item) => {
-             const week = item.week;
-
-             // 해당 주차가 없으면 새로운 배열 생성
-             if (!result[week]) {
-                 result[week] = [];
-             }
-
-             // 주차에 해당하는 데이터 추가
-             result[week].push(item);
-			 return result;
-             
-         }, {});
-         for (const week in groupedData) {
-             outputHtml += "<div class='card shadow'>";
-             outputHtml += "<div class='card-header' id='heading" + week + "'>";
-             outputHtml += "<a role='button' href='#collapse" + week + "' data-toggle='collapse' data-target='#collapse" + week + "' aria-expanded='false' aria-controls='collapse" + week + "' class='collapsed'>";
-             outputHtml += "<strong><span class='fe fe fe-chevron-down'></span> " + week + "주차 </strong>";
-             outputHtml += "</a>";
-             outputHtml += "</div>";
-             outputHtml += "<div id='collapse" + week + "' class='collapse' aria-labelledby='heading" + week + "' data-parent='#accordion1' style=''>";
-             outputHtml += "<div class='card-body'><table class='table table-hover'>";
-             outputHtml += "<thead>";
-             outputHtml += "<tr>";
-             outputHtml += "<th>일지</th>";
-             outputHtml += "<th>업무시작</th>";
-             outputHtml += "<th>업무종료</th>";
-             outputHtml += "<th>총 근무시간</th>";
-             outputHtml += "</tr>";
-             outputHtml += "</thead>";
-             outputHtml += "<tbody>";
-             if (groupedData.hasOwnProperty(week)) {
-                 // 주차에 해당하는 데이터 가져옴
-                 const weeklyData = groupedData[week];
-                 for (var i = 0; i < weeklyData.length; i++) {
-                     var work = weeklyData[i];
-                     outputHtml += "<tr>";
-                     outputHtml += "<td>" + work.workDate + "</td>";  // 예시 필드
-                     outputHtml += "<td>" + work.workStartTime + "</td>";  // 예시 필드
-                     outputHtml += "<td>" + work.workEndTime + "</td>";  // 예시 필드
-                     outputHtml += "</tr>";
-                 }
-               }
-             outputHtml += "</tbody>";
-             outputHtml += "</table></div></div></div>";
-         }
-         document.getElementById("accordion1").innerHTML = outputHtml;
-
-	
-     })
-     .catch(function (error) {
-         alert('error');
-     });
-	//// 근태 목록 
 });
 
 });
@@ -170,7 +230,7 @@ navigator.geolocation.getCurrentPosition((position) => {
 							<li>
 								<dl>
 									<dt>주간 누적 근무시간</dt>
-									<dd id="weeklyTotalTime">28h 26m 0s</dd>
+									<dd id="sumThisWeek1"></dd>
 								</dl>
 							</li>
 						</ul>
@@ -193,11 +253,7 @@ navigator.geolocation.getCurrentPosition((position) => {
                     <div class="card-body my-n2">
                       <div class="d-flex">
                         <div class="flex-fill">
-                          <h4 class="mb-0">120</h4>
-                        </div>
-                        <div class="flex-fill text-right">
-                          <p class="mb-0 small">+20%</p>
-                          <p class="text-muted mb-0 small">last week</p>
+                          <h3 class="mb-0" id="sumThisWeek2"></h3> <!-- 누적시간 -->
                         </div>
                       </div>
                     </div> <!-- .card-body -->
@@ -207,15 +263,13 @@ navigator.geolocation.getCurrentPosition((position) => {
                   <div class="card shadow mb-4">
                     <div class="card-header">
                       <span class="card-title">이번주 초과</span>
-                      <a class="float-right small text-muted" href="#!"><span>+1.8%</span></a>
                     </div>
-                    <div class="card-body my-n1">
+                    <div class="card-body my-n2">
                       <div class="d-flex">
                         <div class="flex-fill">
-                          <h4 class="mb-0">2068</h4>
+                          <h3 class="mb-0" id="overThisWeek"></h3> <!-- 초과시간 -->
                         </div>
-                        <div class="flex-fill text-right">
-                          <span class="sparkline inlinebar"><canvas width="40" height="32" style="display: inline-block; width: 40px; height: 32px; vertical-align: top;"></canvas></span></div>
+                        
                       </div>
                     </div> <!-- .card-body -->
                   </div> <!-- .card -->
@@ -229,11 +283,7 @@ navigator.geolocation.getCurrentPosition((position) => {
                     <div class="card-body my-n2">
                       <div class="d-flex">
                         <div class="flex-fill">
-                          <h4 class="mb-0">120</h4>
-                        </div>
-                        <div class="flex-fill text-right">
-                          <p class="mb-0 small">+20%</p>
-                          <p class="text-muted mb-0 small">last week</p>
+                          <h3 class="mb-0" id="leftThisWeek"></h3>
                         </div>
                       </div>
                     </div> <!-- .card-body -->
@@ -248,11 +298,7 @@ navigator.geolocation.getCurrentPosition((position) => {
                     <div class="card-body my-n2">
                       <div class="d-flex">
                         <div class="flex-fill">
-                          <h4 class="mb-0">120</h4>
-                        </div>
-                        <div class="flex-fill text-right">
-                          <p class="mb-0 small">+20%</p>
-                          <p class="text-muted mb-0 small">last week</p>
+                          <h3 class="mb-0" id="sumThisMonth"></h3>
                         </div>
                       </div>
                     </div> <!-- .card-body -->
@@ -260,108 +306,6 @@ navigator.geolocation.getCurrentPosition((position) => {
                 </div> <!-- .col -->
               </div>
                   <div class="accordion w-100" id="accordion1">
-                    <div class="card shadow">
-                      <div class="card-header" id="heading1">
-                        <a role="button" href="#collapse1" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1" class="collapsed">
-                          <strong><span class="fe fe fe-chevron-down"></span> 1주차 </strong>
-                        </a>
-                      </div>
-                      <div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent="#accordion1" style="">
-                        <div class="card-body"><table class="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>일지<th>
-                            <th>업무시작</th>
-                            <th>업무종료</th>
-                            <th>총 근무시간</th>
-                            <th>근무시간 상세</th>
-                          </tr>
-                        </thead>
-                        <tbody id="aa">
-                          <tr>
-                            <td>3224</td>
-                            <td>Keith Baird</td>
-                            <td>Enim Limited</td>
-                            <td>901-6206 Cras Av.</td>
-                            <td>Apr 24, 2019</td>
-                            <td><span class="badge badge-pill badge-warning">Hold</span></td>
-                          </tr>
-                          <tr>
-                            <td>3218</td>
-                            <td>Graham Price</td>
-                            <td>Nunc Lectus Incorporated</td>
-                            <td>Ap #705-5389 Id St.</td>
-                            <td>May 23, 2020</td>
-                            <td><span class="badge badge-pill badge-success">Success</span></td>
-                          </tr>
-                          <tr>
-                            <td>2651</td>
-                            <td>Reuben Orr</td>
-                            <td>Nisi Aenean Eget Limited</td>
-                            <td>7425 Malesuada Rd.</td>
-                            <td>Nov 4, 2019</td>
-                            <td><span class="badge badge-pill badge-warning">Hold</span></td>
-                          </tr>
-                          <tr>
-                            <td>2636</td>
-                            <td>Akeem Holder</td>
-                            <td>Pellentesque Associates</td>
-                            <td>896 Sodales St.</td>
-                            <td>Mar 27, 2020</td>
-                            <td><span class="badge badge-pill badge-danger">Danger</span></td>
-                          </tr>
-                          <tr>
-                            <td>2757</td>
-                            <td>Beau Barrera</td>
-                            <td>Augue Incorporated</td>
-                            <td>4583 Id St.</td>
-                            <td>Jan 13, 2020</td>
-                            <td><span class="badge badge-pill badge-success">Success</span></td>
-                          </tr>
-                        </tbody>
-                      </table> </div>
-                      </div>
-                    </div>
-                    <div class="card shadow">
-                      <div class="card-header" id="heading1">
-                        <a role="button" href="#collapse2" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                          <strong><span class="fe fe fe-chevron-down"></span> 2주차 </strong>
-                        </a>
-                      </div>
-                      <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent="#accordion1">
-                        <div class="card-body"> . </div>
-                      </div>
-                    </div>
-                    <div class="card shadow">
-                      <div class="card-header" id="heading1">
-                        <a role="button" href="#collapse3" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                          <strong><span class="fe fe fe-chevron-down"></span> 3주차 </strong>
-                        </a>
-                      </div>
-                      <div id="collapse3" class="collapse" aria-labelledby="heading3" data-parent="#accordion1">
-                        <div class="card-body"> . </div>
-                      </div>
-                    </div>
-                                      <div class="card shadow">
-                      <div class="card-header" id="heading1">
-                        <a role="button" href="#collapse4" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-                          <strong><span class="fe fe fe-chevron-down"></span> 4주차 </strong>
-                        </a>
-                      </div>
-                      <div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent="#accordion1">
-                        <div class="card-body"> . </div>
-                      </div>
-                    </div>
-                                      <div class="card shadow">
-                      <div class="card-header" id="heading1">
-                        <a role="button" href="#collapse5" data-toggle="collapse" data-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
-                          <strong><span class="fe fe fe-chevron-down"></span> 5주차 </strong>
-                        </a>
-                      </div>
-                      <div id="collapse5" class="collapse" aria-labelledby="heading5" data-parent="#accordion1">
-                        <div class="card-body"> . </div>
-                      </div>
-                    </div>
                   </div>
                 </div>     
           </div>
