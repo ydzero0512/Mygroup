@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
   <head>
@@ -5,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="_csrf" content="${_csrf.token}"/>
+	<meta name="_csrf_header" content="${_csrf.headerName}"/>
     <link rel="icon" href="favicon.ico">
     <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
     <!-- Simple bar CSS -->
@@ -24,6 +27,8 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="/resources/css/app-light.css" id="lightTheme">
     <link rel="stylesheet" href="/resources/css/app-dark.css" id="darkTheme" disabled>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>	
   </head>
   <body class="vertical  light  ">
     <div class="wrapper">

@@ -1,3 +1,7 @@
+ <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>   
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+ 
+ <meta charset="utf-8">
       <nav class="topnav navbar navbar-light">
         <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
           <i class="fe fe-menu navbar-toggler-icon"></i>
@@ -22,17 +26,39 @@
               <span class="dot dot-md bg-success"></span>
             </a>
           </li>
-          <li class="nav-item dropdown">
+        
+          	<!-- 토큰값 없음 --> 
+            <sec:authorize access="isAnonymous()">
+            <li class="nav-item">
+                <a class="nav-link text-muted my-2" href="#">로그인</a>
+            </li>    
+            </sec:authorize>
+            
+            <!-- 토큰값 있음 --> 
+            <sec:authorize access="isAuthenticated()">
+           	<li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="avatar avatar-sm mt-2">
-                <img src="/resources//assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
+                <img src="/resources/assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
               </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+            <sec:authentication property="principal.member" var="member" />
+            ${member.name}
               <a class="dropdown-item" href="#">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
               <a class="dropdown-item" href="#">Activities</a>
             </div>
-          </li>
+         	</li>
+         
+		    <form action="/logout" method="post">
+		        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		        <button type="submit">로그아웃</button>
+		    </form>
+		  
+            </sec:authorize>
+        
         </ul>
+
       </nav>
+      	

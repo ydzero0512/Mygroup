@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.mygroup.persistence.MemberDAO">
+  	
+  	<!-- VO객체 정보 매핑 -->
+  	
+  	<resultMap type="com.mygroup.domain.MemberVO" id="member">
+  		<result property="content" column="content"/>	
+  	</resultMap>
+  	
+  	<!-- VO객체 정보 매핑 -->
+  	
+  	<resultMap type="com.mygroup.domain.MemberWorkTimeVO" id="mWorkTime">
+  		<result property="content" column="content"/>	
+  	</resultMap>
+  	
+  	<!-- 로그인 -->
+  	<select id="login" resultMap="member">
+  	select * from member where email=#{username}
+  	</select>
+  	
+  	<!-- 사원 생성 -->
+  	
+  	<insert id="createMember">
+	INSERT INTO member (memberId, grade, department, email, phone, name, birthDay, password)
+	VALUES (
+	CONCAT(date_format(now(),"%y%m"), LPAD((SELECT MAX(id) FROM member m), '2', '0')),
+	#{grade},
+	#{department},
+	#{email},
+	#{phone},
+	#{name},
+	#{birthDay},
+	#{password}
+	)
+  	</insert>
+  	
+  	<!-- 사원 근태목록 -->
+  	<select id="readWorkTime" resultMap="mWorkTime">
+  	SELECT *,week(workdate,3)as week, date_format(timediff(workEndTime,workStartTime),'%kh %im %ss') as todayWorkTime
+  	FROM member_workTime
+  	WHERE memberId=#{memberId}  	
+  	<if test="today == 'ok'">AND workDate = date_format(now(),'%Y-%m-%d')</if>
+  	</select>
+  	  	
+  	<!-- 근태관리 출근 -->
+  	<insert id="createWorkStartTime">
+  	INSERT INTO member_workTime (memberId, workDate, workStartTime)
+  	VALUES (#{memberId},date_format(now(),'%Y-%m-%d'),now())
+  	</insert>
+  	
+  	<!-- 근태관리 퇴근 -->
+  	<update id="createWorkEndTime">
+  	UPDATE member_workTime SET workEndTime=now()
+  	WHERE memberId=#{memberId} AND workDate = date_format(now(),'%Y-%m-%d')
+  	</update>
+  	
+  	<!-- 금주 누적 / 초과 및 이번달 누적 -->
+  	<select id="readTimeSum" resultMap="mWorkTime">
+	<if test="isData == 'week'">
+		<![CDATA[
+		SELECT 
+			SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisWeek,
+			TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) AS leftThisWeek,
+			CASE 
+			WHEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) < 0 
+			THEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))))
+			ELSE '00:00:00'
+			END AS overThisWeek
+		FROM member_workTime 
+		WHERE memberId=#{memberId} AND week(workDate,3) = week(now(),3)
+		]]>
+	</if>
+	<if test="isData == 'month'">
+		<![CDATA[
+		SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisMonth
+		FROM member_workTime 
+		WHERE memberId=#{memberId} AND month(workDate) = month(now())
+		]]>
+	</if>
+  	</select>
+
+  </mapper>
