@@ -57,7 +57,7 @@ public class BoardDAOImpl implements BoardDAO {
 	@Override
 	public Map<String, Object> getList(Map<String, Object> paramMap) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		resultMap.put("count", sqlSession.selectOne(NAMESPACE + ".getPostCount", paramMap));
+		resultMap.put("count", sqlSession.selectOne(NAMESPACE + ".getSelectedPostCount", paramMap));
 		resultMap.put("list", sqlSession.selectList(NAMESPACE + ".getSelectedPostList", paramMap));
 		
 		return resultMap;

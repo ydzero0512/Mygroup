@@ -34,13 +34,17 @@ public class BoardRestController {
 	private BoardService bService;
 	
 	@GetMapping(value = "/list/{category}")
-	public ResponseEntity<Map<String, Object>> selectedList(@PathVariable(name = "category") String category, PageVO pvo, Integer page) {
+	public ResponseEntity<Map<String, Object>> selectedList(@PathVariable(name = "category") String category, 
+			PageVO pvo, String filter, String search) {
 		logger.info("RC : list");
-		pvo.setPage(page);
+		
 		pvo.setPageSize(10);
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("category", category);
 		paramMap.put("pvo", pvo);
+		paramMap.put("filter", filter);
+		paramMap.put("search", search);
+		logger.info("filter : " + filter + " / search : " + search);
 		
 		Map<String, Object> resultMap = bService.getList(paramMap);
 		List<BoardVO> list = (List<BoardVO>)resultMap.get("list");

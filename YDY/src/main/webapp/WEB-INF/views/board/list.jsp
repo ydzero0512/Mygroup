@@ -1,67 +1,87 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<html>
-	<head>
-		<title>게시판</title>
-	    <style>
-	        #btnDiv { text-align: center; margin-top: 20px; }
-	        .btns { display: inline-block; padding: 0 10px; height: 28px; line-height: 26px; text-align: center; vertical-align: middle; border-radius: 3px; border: 1px solid transparent; font-weight: 500; }
-	        .btns.save { background: #139dc8; color: #fff; cursor: pointer; }
-	        .btns.back { background: #fff; border: 1px solid #199bc4; color: #199bc4; }
-	        #pageBlock li { list-style-type: none; float: left; margin: 2px;}
-	    </style>
-	</head>
-	<body>
-	   	<select id="category" onchange="moveToCategory()">
-			<option value="0">Category</option>
-			<option value="notice">공지사항</option>
-			<option value="free">자유게시판</option>
-			<option value="secret">대나무숲</option>
-			<option value="fnq">F&Q</option>
-			<option value="qna">Q&A</option>		
-		</select>
-		<a href="create" class="btns back">글쓰기</a>
-	    <table>
-	        <colgroup>
-	            <col style="width: 2%;" />
-	            <col style="width: 80%;" />
-	            <col style="width: 4%;" />
-	            <col style="width: 10%;" />
-	            <col style="width: 12%;" />
-	        </colgroup>
-	        <thead>
-	            <tr>
-	                <th scope="col">번호</th>
-	                <th scope="col">제목</th>
-	                <th scope="col">작성자</th>
-	                <th scope="col">작성일</th>
-	                <th scope="col">조회수</th>
-	            </tr>
-	        </thead>
-	
-	        <!--/* 리스트 데이터 렌더링 영역 */-->
-	        <tbody id="posts">
-	
-	        </tbody>
-	    </table>
+<%@include file="../common/header.html"%>
+<%@include file="../common/topnav.html"%>
+<%@include file="../common/sidenav.html"%>
 
-	    <div id="pageBlock"></div><br>
+		<div class="col-md-12">
+                  <div class="card shadow">
+                    <div class="card-body">
+                      <h5 class="card-title"></h5>
+                      <div class="row">
+	                      <div class="col-md-8">
+	                      	<a href="create" class="btn mb-2 btn-primary">글쓰기</a>
+	                      </div>
+	                      
+	                      <div class="col-md-4">
+		                      <div class="input-group">
+		               		      <select class="form-control select col-md-3" id="filter">
+		                            <option value="title">제목</option>
+		                            <option value="content">내용 </option>
+		                            <option value="writer">작성자</option>
+		                          </select>
+		                        <input type="text" class="form-control" id="search">
+		                        <div class="input-group-append">
+		                          <button class="btn btn-primary" type="button" id="search-button" onclick="search()">Search</button>
+		                        </div>
+		                      </div>
+	                      </div>
+                      </div>
+                      <table class="table table-hover">
+                        <thead>
+                          <tr>
+			                <th scope="col" class="col-md-1">번호</th>
+			                <th scope="col" class="col-md-6">제목</th>
+			                <th scope="col" class="col-md-2">작성자</th>
+			                <th scope="col" class="col-md-2">작성일</th>
+			                <th scope="col" class="col-md-1">조회수</th>
+                          </tr>
+                        </thead>
+                        <tbody id="posts">
+                        </tbody>
+                      </table>
+                      <nav aria-label="Table Paging" class="mb-0 text-muted" id="pageBlock">
+                      </nav>
+                    </div>
+                  </div>
+                </div>
 	    <script>
 	
 //	        window.onload = async () => {
-	            findAllPost();
+				let category = "";
+				switch("${category}") {
+				case "notice":
+					category = "공지사항";
+					break;
+				case "free":
+					category = "자유게시판";
+					break;
+				case "anonymous":
+					category = "익명게시판";
+					break;
+				case "fnq":
+					category = "F&Q";
+					break;
+				case "qna":
+					category = "Q&A";
+					break;
+				}
+				document.querySelector('.card-title').innerHTML = category;
+				const urlParams = new URL(location.href).searchParams;
+				if(urlParams.has('filter')) {
+					document.querySelector('#filter').value = urlParams.get('filter'); 
+				}
+				if(urlParams.has('search')) {
+					document.querySelector('#search').value = urlParams.get('search'); 
+				}
+				
+	            const url = '/board/list/${category}' + decodeURI(location.search);
+	            findPost(url);
 	            sessionStorage.setItem('checkViewCnt', true);
 //	        }
-            document.querySelector('#category').value = '${category}';
 	        // 전체 게시글 조회
-	        async function findAllPost() {
+	        async function findPost(url) {
 	
 	            // 1. API 호출
-	            let page = new URL(location.href).searchParams.get('page');
-	            if(page == null) {
-	            	page = 1;
-	            }
-	            const url = '/board/list/${category}?page=' + page;
 	            const response = await fetch(url);
 	            const result = await response.json();
 	            const pm = result.pm;
@@ -77,10 +97,10 @@
 	            // 3. 리스트 HTML 세팅
 	            let html = '';
 	            list.forEach((item, index) => {
-	            	let reply = "";
-	            	if(item.re_lev > 0 ) {
-	            		reply += '<span style="display:inline-block; width:' + item.re_lev*10 + 'px;"></span>';
-	            		reply += "ㄴ";
+	            	let reply = '';
+	            	if(item.re_lev > 0) {
+	 		           	reply += '<span style="display:inline-block; width:' + item.re_lev*10 + 'px;">';
+	 		           	reply += '</span><span class="fe fe-24 fe-corner-down-right"></span> ';	            		
 	            	}
 	            	html += '<tr><td>'+ (item.bno)+'</td>';
 	                html += '<td class="left"><a href="/board';
@@ -90,7 +110,7 @@
 	               	html += reply;
 	                html += item.title;
 	                html += '</a></td>';
-	                html += '<td>'+ item.writer + '</td>';
+	                html += '${category}' == 'anonymous' ? '<td>익명</td>' : '<td>'+ item.writer + '</td>';
 	                html += '<td>'+ item.wdate + '</td>';
 	                html += '<td>'+ item.readcount + '</td>';
 	                html += '</tr>';
@@ -98,31 +118,38 @@
 	 //           console.log(html);
 	            // 4. 리스트 HTML 렌더링
 	            document.querySelector('#posts').innerHTML = html;
-	            
+	            let page = '';
+	            if(urlParams.has('page')) {
+		            page = urlParams.get('page');
+		            urlParams.delete('page');
+	            }
+	            const params = urlParams.size >= 1 ? '&' + urlParams.toString() : '';
 		        let block = '';
+		        block += '<ul class="pagination justify-content-center mb-0">';
 		        if(pm.prev) {
 		        	const prev = pm.startPage-1;
-		        	block += '<li><a href="/board/${category }/list?page=' + prev + '">«</a></li>';
+		        	block += '<li class="page-item"><a class="page-link" href="/board/${category}/list?page=' + prev + params + '">Previous</a></li>';		        	
 		        }
 				for(var i=pm.startPage; i<=pm.endPage; i++) {
-					block += '<li ';
-					block += pm.pageVO.page == i? 'class="active"':'';
-					block += ' class="active"><a href="/board/${category }/list?page='+i+'">'+i+'</a></li>';
+					block += '<li class="page-item';
+					if(page == i) block += ' active';					
+					block += '"><a class="page-link" href="/board/${category}/list?page=' + i + params + '">'+i+'</a></li>';
 				}
 				if(pm.next && pm.endPage > 0) {
 				 	const next = pm.endPage+1;
-				 	block += '<li><a href="/board/${category }/list?page=' + next + '">»</a></li>';
+				 	block += '<li class="page-item"><a class="page-link" href="/board/${category}/list?page=' + next + params + '">Next</a></li>';
 				 }
+				block += '</ul>';
 				document.querySelector('#pageBlock').innerHTML = block;
 
 	        }
-	        
-	        function moveToCategory() {
-	        	if(document.querySelector('#category').value == 0) return;
-	        	location.href = "/board/" + document.querySelector('#category').value + "/list";
+	        async function search() {
+	            const filter = document.querySelector('#filter').value;
+	            const search = document.querySelector('#search').value;
+	           	//if(search == null || search == '') return;
+	            const url = '/board/${category}/list?page=1&filter=' + filter + '&search=' + search;
+	            location.href=url;
 	        }
-	
+	        //function makeUrl
 	    </script>
-	
-	</body>
-</html>
+<%@include file="../common/footer.html"%>
