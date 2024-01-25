@@ -42,6 +42,15 @@
 			category = #{category}
 		</where>
 	</select>
+  	<select id="getSelectedPostCount" parameterType="java.util.Map" resultType="int">
+		select count(*) from board
+		<where>
+			category = #{category}
+ 			<if test="filter != NULL and search != NULL">
+				and ${filter} like CONCAT('%', #{search}, '%')
+			</if>
+		</where>
+	</select>
 	
 	<select id="getPostList" resultMap="boardVO">
 		select bno, title, writer, wdate, udate, category from board
@@ -51,6 +60,9 @@
 		select bno, title, writer, wdate, udate, category, readcount, re_ref, re_lev, re_seq from board
 		<where>
 			category = #{category}
+ 			<if test="filter != NULL and search != NULL">
+				and ${filter} like CONCAT('%', #{search}, '%')
+			</if>
 			order by re_ref desc, re_seq asc 
 	  		limit #{pvo.startPage}, #{pvo.pageSize}
 		</where>
