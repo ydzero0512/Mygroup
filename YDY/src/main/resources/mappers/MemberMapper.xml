@@ -58,37 +58,29 @@
   	WHERE memberId=#{memberId} AND workDate = date_format(now(),'%Y-%m-%d')
   	</update>
   	
-  	<!-- 금주 누적 / 초과 -->
+  	<!-- 금주 누적 / 초과 및 이번달 누적 -->
   	<select id="readTimeSum" resultMap="mWorkTime">
-  
-  <if test="isData == 'week'">
-    <![CDATA[
-      SELECT 
-        SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisWeek,
-        TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) AS leftThisWeek,
-        CASE 
-          WHEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) < 0 
-          THEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))))
-          ELSE '00:00:00'
-        END AS overThisWeek
-      FROM member_workTime 
-      WHERE memberId=#{memberId} AND week(workDate,3) = week(now(),3)
-    ]]>
-  </if>
-  <if test="isData == 'month'">
-    <![CDATA[
-      SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisMonth
-      FROM member_workTime 
-      WHERE memberId=#{memberId} AND month(workDate) = month(now())
-    ]]>
-  </if>
+	<if test="isData == 'week'">
+		<![CDATA[
+		SELECT 
+			SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisWeek,
+			TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) AS leftThisWeek,
+			CASE 
+			WHEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime))))) < 0 
+			THEN TIMEDIFF('40:00:00', SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))))
+			ELSE '00:00:00'
+			END AS overThisWeek
+		FROM member_workTime 
+		WHERE memberId=#{memberId} AND week(workDate,3) = week(now(),3)
+		]]>
+	</if>
+	<if test="isData == 'month'">
+		<![CDATA[
+		SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) AS sumThisMonth
+		FROM member_workTime 
+		WHERE memberId=#{memberId} AND month(workDate) = month(now())
+		]]>
+	</if>
   	</select>
 
-	<!-- 이번달 누적 -->
-	<select id="readThisMonth" resultMap="mWorkTime">
-	SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(workEndTime, workStartTime)))) 'sumThisMonth'
-  	FROM member_workTime 
-    WHERE month(workDate) = month(now())
-    AND memberId=#{memberId}
-	</select>
   </mapper>
